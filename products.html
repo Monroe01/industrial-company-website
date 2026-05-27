@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>产品中心 - 福摩索</title>
+<meta name="keywords" content="预成型焊片,焊膏,焊丝,助焊剂,福摩索" />
+<meta name="description" content="福摩索产品中心，提供锡银铜、金锡、锡铋等多种规格预成型焊片，专业定制。" />
+<link rel="stylesheet" href="css/base.css">
+<style>
+/* ── 产品中心专属样式 ── */
+.prod-banner {
+  background: linear-gradient(135deg, #0a6db8 0%, #0a9ed6 100%);
+  padding: 48px 0 40px;
+  color: #fff;
+  text-align: center;
+}
+.prod-banner h1 { font-size: 34px; margin-bottom: 10px; }
+.prod-banner p  { font-size: 15px; opacity: .85; }
+
+.prod-main { padding: 48px 0 80px; background: var(--bg-light); }
+
+/* 分类筛选 */
+.cat-filter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+.cat-btn {
+  padding: 8px 22px;
+  border-radius: 30px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.cat-btn:hover  { border-color: var(--blue); color: var(--blue); }
+.cat-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+
+/* 产品卡片网格 */
+.prod-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+.pc-card {
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  border: 1px solid var(--border);
+  transition: transform .3s, box-shadow .3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+.pc-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 36px rgba(0,0,0,.12);
+  border-color: var(--blue);
+}
+.pc-card .pc-img {
+  height: 200px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #e8f5fd, #d0ebf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.pc-card .pc-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s;
+}
+.pc-card:hover .pc-img img { transform: scale(1.06); }
+.pc-img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--blue);
+  opacity: .6;
+}
+.pc-img-placeholder svg { width: 54px; height: 54px; }
+.pc-img-placeholder span { font-size: 12px; letter-spacing: 1px; }
+.pc-card .pc-cat {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(10,132,214,.85);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.pc-card .pc-info { padding: 18px 18px 20px; flex: 1; display: flex; flex-direction: column; }
+.pc-card .pc-info h3 {
+  font-size: 15px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.pc-card .pc-info p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.pc-card .pc-info .pc-specs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.pc-card .pc-info .pc-spec {
+  font-size: 11px;
+  background: var(--blue-light);
+  color: var(--blue);
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+.pc-card .pc-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px 16px;
+  border-top: 1px solid #f1f5f9;
+}
+.pc-card .pc-footer .more {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+}
+.pc-card .pc-footer .more::after { content: " →"; }
+.pc-card .pc-footer .consult {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 5px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: all .2s;
+}
+.pc-card:hover .pc-footer .consult {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+/* 空状态 */
+.no-result {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<div class="head">
+  <div class="h-top">
+    <div class="wrap flexb">
+      <span>欢迎访问 <strong>福摩索</strong> 官方网站</span>
+      <span>
+        <a href="#">收藏本站</a><em>|</em>
+        <a href="#">在线留言</a><em>|</em>
+        <a href="#">常见问答</a><em>|</em>
+        <a href="#">网站地图</a>
+      </span>
+    </div>
+  </div>
+  <div class="h-main">
+    <div class="wrap flexb">
+      <a href="index.html" class="flexc h-logo">
+        <img src="img/logo.png" alt="福摩索">
+        <img src="img/img1.png" alt="福摩索">
+      </a>
+      <div class="h-tel">
+        <div class="label">全国服务热线（工作日 9:00—18:00）</div>
+        <div class="number">400-000-0000</div>
+      </div>
+    </div>
+  </div>
+  <nav class="h-nav">
+    <ul>
+      <li><a href="index.html">福摩索首页</a></li>
+      <li class="active">
+        <a href="products.html">产品中心</a>
+        <div class="nav-drop">
+          <div class="drop-links">
+            <a href="products.html?cat=锡银铜焊片">锡银铜焊片</a>
+            <a href="products.html?cat=金锡焊片">金锡焊片</a>
+            <a href="products.html?cat=锡铋焊片">锡铋焊片</a>
+            <a href="products.html?cat=锡铅焊片">锡铅焊片</a>
+            <a href="products.html?cat=锡铜焊片">锡铜焊片</a>
+            <a href="products.html?cat=高温焊片">高温焊片</a>
+          </div>
+          <div class="drop-img">
+            <div style="width:100%;height:90px;background:linear-gradient(135deg,#0a84d6,#0a6db8);border-radius:4px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:13px;">产品图片</div>
+            <p>核心产品，专业定制<br>欢迎咨询 400-000-0000</p>
+          </div>
+        </div>
+      </li>
+      <li>
+        <a href="#">解决方案</a>
+        <div class="nav-drop">
+          <div class="drop-links">
+            <a href="#">行业方案一</a>
+            <a href="#">行业方案二</a>
+            <a href="#">行业方案三</a>
+            <a href="#">行业方案四</a>
+          </div>
+          <div class="drop-img">
+            <div style="width:100%;height:90px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:4px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:13px;">方案图片</div>
+            <p>深度定制行业解决方案<br>多年经验、值得信赖</p>
+          </div>
+        </div>
+      </li>
+      <li><a href="#">新闻资讯</a></li>
+      <li><a href="#">关于我们</a></li>
+      <li><a href="#">联系我们</a></li>
+    </ul>
+  </nav>
+</div>
+
+<!-- 面包屑 -->
+<div class="breadcrumb-bar">
+  <div class="wrap">
+    <a href="index.html">首页</a>
+    <span class="sep">›</span>
+    <span>产品中心</span>
+  </div>
+</div>
+
+<!-- 顶部横幅 -->
+<div class="prod-banner">
+  <div class="wrap">
+    <h1>产品中心</h1>
+    <p>深耕预成型焊片 20 年，覆盖锡银铜、金锡、锡铋等多种合金体系，支持专业定制</p>
+  </div>
+</div>
+
+<!-- 产品主体 -->
+<div class="prod-main">
+  <div class="wrap">
+
+    <!-- 分类筛选 -->
+    <div class="cat-filter" id="catFilter">
+      <button class="cat-btn active" data-cat="全部">全部产品</button>
+      <button class="cat-btn" data-cat="锡银铜焊片">锡银铜焊片</button>
+      <button class="cat-btn" data-cat="金锡焊片">金锡焊片</button>
+      <button class="cat-btn" data-cat="锡铋焊片">锡铋焊片</button>
+      <button class="cat-btn" data-cat="锡铅焊片">锡铅焊片</button>
+      <button class="cat-btn" data-cat="锡铜焊片">锡铜焊片</button>
+      <button class="cat-btn" data-cat="高温焊片">高温焊片</button>
+    </div>
+
+    <!-- 产品网格 -->
+    <div class="prod-grid" id="prodGrid"></div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="ft-top">
+    <div class="wrap ft-grid">
+      <div class="ft-brand">
+        <div class="logo">福摩索</div>
+        <p>深耕行业20年，专注核心技术研发与产品创新，<br>为全球1000+客户提供高品质产品与完整解决方案。</p>
+        <div class="socials">
+          <a href="#" title="微信">微</a>
+          <a href="#" title="微博">博</a>
+          <a href="#" title="LinkedIn">in</a>
+          <a href="#" title="YouTube">▶</a>
+        </div>
+      </div>
+      <div class="ft-col">
+        <h4>产品中心</h4>
+        <ul>
+          <li><a href="products.html?cat=锡银铜焊片">锡银铜焊片</a></li>
+          <li><a href="products.html?cat=金锡焊片">金锡焊片</a></li>
+          <li><a href="products.html?cat=锡铋焊片">锡铋焊片</a></li>
+          <li><a href="products.html?cat=高温焊片">高温焊片</a></li>
+          <li><a href="products.html">查看全部</a></li>
+        </ul>
+      </div>
+      <div class="ft-col">
+        <h4>解决方案</h4>
+        <ul>
+          <li><a href="#">消费电子方案</a></li>
+          <li><a href="#">汽车电子方案</a></li>
+          <li><a href="#">航空航天方案</a></li>
+          <li><a href="#">医疗设备方案</a></li>
+          <li><a href="#">新闻资讯</a></li>
+        </ul>
+      </div>
+      <div class="ft-col">
+        <h4>联系我们</h4>
+        <div class="contact-item"><div><strong>服务热线</strong>400-000-0000</div></div>
+        <div class="contact-item"><div><strong>企业邮箱</strong>info@company.com</div></div>
+        <div class="contact-item"><div><strong>公司地址</strong>省市区街道详细地址</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <div class="wrap">
+      Copyright © 2024 福摩索 版权所有 &nbsp;|&nbsp;
+      <a href="#">粤ICP备XXXXXXXX号</a> &nbsp;|&nbsp;
+      <a href="#">隐私政策</a> &nbsp;|&nbsp;
+      <a href="#">网站地图</a>
+    </div>
+  </div>
+</footer>
+
+<!-- 悬浮客服 -->
+<div class="float-kf">
+  <ul>
+    <li>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        <span>在线咨询</span>
+      </a>
+    </li>
+    <li>
+      <a href="tel:4000000000">
+        <svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+        <span>400-000-0000</span>
+      </a>
+      <div class="tel-popup">客服热线<strong>400-000-0000</strong></div>
+    </li>
+    <li class="kf-top" id="backTop">
+      <svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    </li>
+  </ul>
+</div>
+
+<script src="js/product.js"></script>
+</body>
+</html>
