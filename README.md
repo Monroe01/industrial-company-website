@@ -33,41 +33,83 @@
 
 - Python 3.8 及以上
 - Flask 3.x
+- Gunicorn（生产环境）
+- Nginx（生产环境反向代理）
 
-### 安装 Flask
+### 安装依赖
 
 ```bash
-pip install flask
+pip install flask gunicorn
 ```
 
 ---
 
-## 启动项目
+## 生产环境部署
 
-在项目根目录下运行：
+### 1. 上传项目文件
+
+将项目文件上传至服务器，例如放置在 `/var/www/company-site/`。
+
+### 2. 使用 Gunicorn 启动服务
 
 ```bash
-python3 server.py
+cd /var/www/company-site
+gunicorn -w 4 -b 127.0.0.1:8080 server:app
 ```
 
-启动成功后终端会显示：
+参数说明：
+- `-w 4`：启动 4 个工作进程（可根据服务器 CPU 核数调整）
+- `-b 127.0.0.1:8080`：监听本地 8080 端口，由 Nginx 做反向代理
 
+如需后台持续运行，建议配合 `systemd` 管理服务进程。
+
+### 3. 配置 Nginx 反向代理
+
+在 Nginx 配置文件（如 `/etc/nginx/sites-available/company-site`）中添加：
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com www.your-domain.com;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /pictures/ {
+        alias /var/www/company-site/pictures/;
+    }
+
+    location /img/ {
+        alias /var/www/company-site/img/;
+    }
+}
 ```
-✅ 数据库已就绪：.../db/product.db
-🚀 服务启动：http://localhost:8080
+
+替换 `your-domain.com` 为公司实际域名，然后重载 Nginx：
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
-然后在浏览器打开 **http://localhost:8080** 即可访问网站。
+### 4. 访问网站
 
-> ⚠️ 必须通过 `server.py` 启动，直接用浏览器打开 HTML 文件会导致产品数据无法加载。
+部署完成后，通过公司域名访问：
+
+- 前台官网：`https://your-domain.com`
+- 后台管理：`https://your-domain.com/admin/`
 
 ---
 
 ## 后台管理
 
-访问地址：**http://localhost:8080/admin/**
+访问地址：**https://your-domain.com/admin/**
 
-默认账号：
+> ⚠️ 正式上线前，请务必修改默认账号密码（见下方「安全配置」章节）。
+
+默认账号（仅供初次部署测试使用）：
 - 用户名：`admin`
 - 密码：`123456`
 
@@ -161,8 +203,18 @@ info@company.com  # 邮箱
 
 ---
 
+## 安全配置
+
+正式上线前，请完成以下安全设置：
+
+- **修改后台密码**：在 `admin/index.html` 中搜索默认密码 `123456` 并替换为强密码
+- **配置 HTTPS**：使用 Let's Encrypt 为域名申请免费 SSL 证书，并在 Nginx 中配置 443 端口
+- **限制后台访问**：可在 Nginx 中为 `/admin/` 路径添加 IP 白名单，仅允许公司内网访问
+
+---
+
 ## 注意事项
 
-- 产品图片以 Base64 格式存储在 SQLite 数据库中，上传大量高清图片会使 `db/product.db` 文件增大
-- `server.py` 为开发模式，正式上线建议使用 Gunicorn + Nginx 部署
-- 后台账号密码目前为前端验证，正式使用前请在 `admin/index.html` 中修改默认密码
+- 产品图片以 Base64 格式存储在 SQLite 数据库中，上传大量高清图片会使 `db/product.db` 文件增大，建议定期备份
+- SQLite 适合中小规模访问量；如日访问量较高，建议迁移至 MySQL 或 PostgreSQL
+- 部署后如需更新网站内容，重新上传对应文件后重载 Gunicorn 进程即可
